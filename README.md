@@ -1,4 +1,4 @@
 mscover2xml
 ===========
 
-MS Coverage files to XML converter
+Converts from MS Test coverage files to XML.

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <MSBuildTasksPath Condition="'$(MSBuildTasksPath)' == ''">$(MSBuildExtensionsPath)\ConvertMSTestCoverageToXml</MSBuildTasksPath>
+        <MSBuildTasksLib>$(MSBuildTasksPath)\MSCover2Xml.MSBuild.Tasks.dll</MSBuildTasksLib>
+    </PropertyGroup>
+
+    <UsingTask AssemblyFile="$(MSBuildTasksLib)" TaskName="MSCover2Xml.MSBuild.Tasks.ConvertMSTestCoverageToXml" />
+</Project>

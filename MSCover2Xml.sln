@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSCover2Xml", "src\MSCover2Xml\MSCover2Xml.csproj", "{92386C17-75C0-4EA0-8389-AA57CE994409}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSCover2Xml.Console", "src\MSCover2Xml.Console\MSCover2Xml.Console.csproj", "{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSCover2Xml.MSBuild.Tasks", "src\MSCover2Xml.MSBuild.Tasks\MSCover2Xml.MSBuild.Tasks.csproj", "{27FE14F9-B554-49FE-84F7-4A83478595B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C974C235-DD73-40E7-B4B4-E49AEF52D271}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC5E68AA-0609-46CE-8E68-F01972405F92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSCover2Xml.Tests", "tests\MSCover2Xml.Tests\MSCover2Xml.Tests.csproj", "{12B803E5-130A-468F-8953-E2FE8D5D4761}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{92386C17-75C0-4EA0-8389-AA57CE994409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92386C17-75C0-4EA0-8389-AA57CE994409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92386C17-75C0-4EA0-8389-AA57CE994409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92386C17-75C0-4EA0-8389-AA57CE994409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27FE14F9-B554-49FE-84F7-4A83478595B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27FE14F9-B554-49FE-84F7-4A83478595B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27FE14F9-B554-49FE-84F7-4A83478595B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27FE14F9-B554-49FE-84F7-4A83478595B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12B803E5-130A-468F-8953-E2FE8D5D4761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12B803E5-130A-468F-8953-E2FE8D5D4761}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12B803E5-130A-468F-8953-E2FE8D5D4761}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12B803E5-130A-468F-8953-E2FE8D5D4761}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12B803E5-130A-468F-8953-E2FE8D5D4761} = {C974C235-DD73-40E7-B4B4-E49AEF52D271}
+		{92386C17-75C0-4EA0-8389-AA57CE994409} = {CC5E68AA-0609-46CE-8E68-F01972405F92}
+		{FED8E9FB-17FA-4567-869D-D8DC00F6A7CC} = {CC5E68AA-0609-46CE-8E68-F01972405F92}
+		{27FE14F9-B554-49FE-84F7-4A83478595B3} = {CC5E68AA-0609-46CE-8E68-F01972405F92}
+	EndGlobalSection
+EndGlobal
