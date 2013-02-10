@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
+using Microsoft.VisualStudio.Coverage.Analysis;
 using VSCoverageStatistics = Microsoft.VisualStudio.Coverage.Analysis.CoverageStatistics;
 
 namespace MSCover2Xml
@@ -76,6 +78,27 @@ namespace MSCover2Xml
             _linesCovered = statistics.LinesCovered;
             _linesNotCovered = statistics.LinesNotCovered;
             _linesPartiallyCovered = statistics.LinesPartiallyCovered;
+        }
+
+        /// <summary>
+        /// Creates a method coverage statistics based on given coverage buffer.
+        /// </summary>
+        /// <param name="id">Identification assigned to the method.</param>
+        /// <param name="name">Method name.</param>
+        /// <param name="fullName">Method full name.</param>
+        /// <param name="coverageBuffer">Coverage buffer.</param>
+        /// <param name="lines">Lines representing the method.</param>
+        /// <param name="files">List to which instrumented files are added.</param>
+        /// <returns>New <see cref="MethodStatistics"/> instance.</returns>
+        internal static MethodStatistics Create(uint id, string name, string fullName, byte[] coverageBuffer, IList<BlockLineRange> lines, FileSpecList files)
+        {
+            var coverageStats = CoverageInfo.GetMethodStatistics(coverageBuffer, lines);
+            var methodStats = new MethodStatistics(id, name, fullName, coverageStats);
+
+            foreach (var block in BlockCoverage.CreateForMethod(coverageBuffer, lines, files))
+                methodStats.AddBlock(block);
+
+            return methodStats;
         }
 
         /// <summary>

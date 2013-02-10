@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Xml;
 using CommandLine;
 
 namespace MSCover2Xml.Console
@@ -13,8 +11,8 @@ namespace MSCover2Xml.Console
             if (!CommandLineParser.Default.ParseArguments(args, options))
                 return;
             
-            var symbolPaths = (options.SymbolPaths ?? Path.GetDirectoryName(options.InputFile)).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
-            var executablePaths = (options.ExecutablePaths ?? Path.GetDirectoryName(options.InputFile)).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var symbolPaths = (options.SymbolPaths ?? string.Empty).Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            var executablePaths = (options.ExecutablePaths ?? string.Empty).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
             System.Console.WriteLine("Generating coverage report from {0} ...", options.InputFile);
             PrintPaths("Symbols", symbolPaths);
@@ -22,11 +20,9 @@ namespace MSCover2Xml.Console
 
             try
             {
-                var coverageReport = CoverageReportGenerator.Create(options.InputFile, executablePaths, symbolPaths);
-
                 System.Console.WriteLine("Generating XML at {0} ...", options.OutputFile);
 
-                coverageReport.SaveToFile(options.OutputFile);
+                CoverageReport.WriteXml(options.InputFile, options.OutputFile, executablePaths, symbolPaths);
 
                 System.Console.WriteLine("Done");
             }

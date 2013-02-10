@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Xml;
 using Microsoft.VisualStudio.Coverage.Analysis;
 
@@ -50,6 +52,47 @@ namespace MSCover2Xml
             ColumnStart = columnStart;
             ColumnEnd = columnEnd;
             Coverage = coverage;
+        }
+
+        /// <summary>
+        /// Creates a block coverage information list for a single method represented by a set of lines.
+        /// </summary>
+        /// <param name="coverageBuffer">Buffer containing all coverage information.</param>
+        /// <param name="lines">Lines representing a single method.</param>
+        /// <param name="files">List to which instrumented files are added.</param>
+        internal static IEnumerable<BlockCoverage> CreateForMethod(byte[] coverageBuffer, IList<BlockLineRange> lines, FileSpecList files)
+        {
+            if (coverageBuffer == null) throw new ArgumentNullException("coverageBuffer");
+            if (lines == null) throw new ArgumentNullException("lines");
+            if (files == null) throw new ArgumentNullException("files");
+
+            // First generate block coverage map based on the coverage buffer ...
+            var blockCoverageMap = GetBlockCoverageMap(coverageBuffer, lines);
+            // Then create coverage information for all lines of the method.
+            var blocks = new List<BlockCoverage>();
+            foreach (var line in lines.Where(line => line.IsValid))
+            {
+                var file = files.GetOrAdd(line.SourceFile);
+                blocks.Add(new BlockCoverage(file, line.StartLine, line.EndLine, line.StartColumn, line.EndColumn, blockCoverageMap[line]));
+            }
+            return blocks;
+        }
+
+        private static IDictionary<BlockLineRange, CoverageStatus> GetBlockCoverageMap(byte[] coverageBuffer, ICollection<BlockLineRange> lines)
+        {
+            var lineCoverage = new Dictionary<BlockLineRange, CoverageStatus>(lines.Count);
+            foreach (var line in lines.Where(line => line.IsValid))
+            {
+                CoverageStatus currentLineStatus;
+                // Block is covered if coverage information byte is non-zero. If byte is zero then it is not covered.
+                var blockStatus = (int)coverageBuffer[line.BlockIndex] == 0 ? CoverageStatus.NotCovered : CoverageStatus.Covered;
+                lineCoverage[line] = !lineCoverage.TryGetValue(line, out currentLineStatus)
+                                         ? blockStatus // If there is no info about coverage status for the line as of yet, then just use block status
+                                         : (currentLineStatus == blockStatus)
+                                               ? currentLineStatus // If previous blocks are all covered or not covered then status for the whole line is the same.
+                                               : CoverageStatus.PartiallyCovered; // If some blocks are covered and some not then line is partially covered.
+            }
+            return lineCoverage;
         }
 
         /// <summary>

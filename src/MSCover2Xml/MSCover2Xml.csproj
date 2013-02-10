@@ -42,10 +42,10 @@
   <ItemGroup>
     <Compile Include="ClassStatistics.cs" />
     <Compile Include="CoverageReport.cs" />
-    <Compile Include="CoverageReportGenerator.cs" />
     <Compile Include="FileSpec.cs" />
     <Compile Include="CoverageStatistics.cs" />
     <Compile Include="BlockCoverage.cs" />
+    <Compile Include="FileSpecList.cs" />
     <Compile Include="MethodStatistics.cs" />
     <Compile Include="ModuleStatistics.cs" />
     <Compile Include="NamespaceStatistics.cs" />

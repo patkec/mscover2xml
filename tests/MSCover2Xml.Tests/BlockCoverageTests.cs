@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Coverage.Analysis;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.Coverage.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 

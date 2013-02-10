@@ -48,8 +48,7 @@ namespace MSCover2Xml.MSBuild.Tasks
                         string outputFile = GetOutputFile(itemSpec);
                         string symbolsDirectory = GetSymbolsDirectory(itemSpec);
 
-                        var coverageReport = CoverageReportGenerator.Create(itemSpec, new[] {symbolsDirectory}, new[] {symbolsDirectory});
-                        coverageReport.SaveToFile(outputFile);
+                        CoverageReport.WriteXml(itemSpec, outputFile, new[] { symbolsDirectory }, new[] { symbolsDirectory });
                         
                         list.Add(new TaskItem(outputFile));
                         Log.LogMessageFromResources(MessageImportance.Normal, "WrittenXmlCoverageFile", new object[] { outputFile });

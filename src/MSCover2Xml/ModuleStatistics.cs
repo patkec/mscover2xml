@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Microsoft.VisualStudio.Coverage.Analysis;
 
 namespace MSCover2Xml
 {
@@ -62,18 +63,46 @@ namespace MSCover2Xml
         /// <param name="imageLinkTime">Time stamp of the compiled module, in epoch time.</param>
         internal ModuleStatistics(string name, long imageSize, long imageLinkTime)
         {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+            if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
             Name = name;
             ImageSize = imageSize;
-            SetImageLinkTime(imageLinkTime);
+            ImageLinkTime = Epoch.AddSeconds(imageLinkTime);
         }
 
-        private void SetImageLinkTime(long secondsFromEpoch)
+        /// <summary>
+        /// Creates a module coverage statistics based on given coverage buffer.
+        /// </summary>
+        /// <param name="files">List to which instrumented files are added.</param>
+        /// <param name="module">Information about module coverage.</param>
+        /// <returns>New <see cref="ModuleStatistics"/> instance.</returns>
+        internal static ModuleStatistics Create(FileSpecList files, ICoverageModule module)
         {
-            if (secondsFromEpoch < 0) throw new ArgumentOutOfRangeException("secondsFromEpoch");
+            var moduleStats = new ModuleStatistics(module.Name, module.ImageSize, module.ImageLinkTime);
 
-            ImageLinkTime = Epoch.AddSeconds(secondsFromEpoch);
+            var lines = new List<BlockLineRange>();
+            var coverageBuffer = module.GetCoverageBuffer(null /* tests */);
+            using (var symbolReader = module.Symbols.CreateReader())
+            {
+                uint methodId;
+                string methodName;
+                string undecoratedMethodName;
+                string className;
+                string namespaceName;
+
+                while (symbolReader.GetNextMethod(out methodId, out methodName, out undecoratedMethodName, out className, out namespaceName, lines))
+                {
+                    var namespaceStats = moduleStats.GetOrAddNamespace(namespaceName);
+                    var classStats = namespaceStats.GetOrAddClass(className);
+
+                    var methodStats = MethodStatistics.Create(methodId, methodName, undecoratedMethodName, coverageBuffer, lines, files);
+                    classStats.AddMethod(methodStats);
+
+                    // Clear the method list to be ready for next method.
+                    lines.Clear();
+                }
+            }
+            return moduleStats;
         }
 
         /// <summary>
@@ -83,7 +112,7 @@ namespace MSCover2Xml
         /// <returns><see cref="NamespaceStatistics"/> for the specified namespace name.</returns>
         internal NamespaceStatistics GetOrAddNamespace(string namespaceName)
         {
-            if (string.IsNullOrEmpty(namespaceName)) throw new ArgumentNullException("namespaceName");
+            if (String.IsNullOrEmpty(namespaceName)) throw new ArgumentNullException("namespaceName");
 
             var namespaceStats = _namespaces.Find(x => x.NamespaceName == namespaceName);
             if (namespaceStats == null)
