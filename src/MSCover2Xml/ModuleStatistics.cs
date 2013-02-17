@@ -23,6 +23,10 @@ namespace MSCover2Xml
         /// </summary>
         public string Name { get; private set; }
         /// <summary>
+        /// Gets the module unique signature.
+        /// </summary>
+        public Guid Signature { get; private set; }
+        /// <summary>
         /// Gets the size, in bytes, of the compiled assembly for the module.
         /// </summary>
         public long ImageSize { get; private set; }
@@ -59,13 +63,15 @@ namespace MSCover2Xml
         /// Initializes a new instance of the <see cref="ModuleStatistics"/> class.
         /// </summary>
         /// <param name="name">Module name.</param>
+        /// <param name="signature">Module signature.</param>
         /// <param name="imageSize">Size of the compiled module, in bytes.</param>
         /// <param name="imageLinkTime">Time stamp of the compiled module, in epoch time.</param>
-        internal ModuleStatistics(string name, long imageSize, long imageLinkTime)
+        internal ModuleStatistics(string name, Guid signature, long imageSize, long imageLinkTime)
         {
             if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
             Name = name;
+            Signature = signature;
             ImageSize = imageSize;
             ImageLinkTime = Epoch.AddSeconds(imageLinkTime);
         }
@@ -75,10 +81,11 @@ namespace MSCover2Xml
         /// </summary>
         /// <param name="files">List to which instrumented files are added.</param>
         /// <param name="module">Information about module coverage.</param>
+        /// <param name="lineStartId">Starting identification number for method lines.</param>
         /// <returns>New <see cref="ModuleStatistics"/> instance.</returns>
-        internal static ModuleStatistics Create(FileSpecList files, ICoverageModule module)
+        internal static ModuleStatistics Create(FileSpecList files, ICoverageModule module, ref long lineStartId)
         {
-            var moduleStats = new ModuleStatistics(module.Name, module.ImageSize, module.ImageLinkTime);
+            var moduleStats = new ModuleStatistics(module.Name, module.Signature, module.ImageSize, module.ImageLinkTime);
 
             var lines = new List<BlockLineRange>();
             var coverageBuffer = module.GetCoverageBuffer(null /* tests */);
@@ -95,7 +102,7 @@ namespace MSCover2Xml
                     var namespaceStats = moduleStats.GetOrAddNamespace(namespaceName);
                     var classStats = namespaceStats.GetOrAddClass(className);
 
-                    var methodStats = MethodStatistics.Create(methodId, methodName, undecoratedMethodName, coverageBuffer, lines, files);
+                    var methodStats = MethodStatistics.Create(methodId, methodName, undecoratedMethodName, coverageBuffer, lines, files, ref lineStartId);
                     classStats.AddMethod(methodStats);
 
                     // Clear the method list to be ready for next method.
@@ -117,7 +124,7 @@ namespace MSCover2Xml
             var namespaceStats = _namespaces.Find(x => x.NamespaceName == namespaceName);
             if (namespaceStats == null)
             {
-                namespaceStats = new NamespaceStatistics(namespaceName);
+                namespaceStats = new NamespaceStatistics(this, namespaceName);
                 _namespaces.Add(namespaceStats);
             }
             return namespaceStats;
@@ -136,14 +143,12 @@ namespace MSCover2Xml
             xmlWriter.WriteElementString("ImageLinkTime", ImageLinkTime.ToString("o"));
             WriteCoverageToXml(xmlWriter);
 
-            xmlWriter.WriteStartElement("Namespaces");
             foreach (var ns in Namespaces)
             {
-                xmlWriter.WriteStartElement("Namespace");
+                xmlWriter.WriteStartElement("NamespaceTable");
                 ns.WriteXml(xmlWriter);
                 xmlWriter.WriteEndElement();
             }
-            xmlWriter.WriteEndElement();
         }
 
         /// <summary>

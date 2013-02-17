@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MSCover2Xml.Tests
@@ -12,7 +13,7 @@ namespace MSCover2Xml.Tests
 
         private static ModuleStatistics CreateModuleStatistics()
         {
-            var moduleStats = new ModuleStatistics("Module", 50 /* imageSize */, 4 /* linkTime */);
+            var moduleStats = new ModuleStatistics("Module", Guid.Empty, 50 /* imageSize */, 4 /* linkTime */);
             var methodCoverageStats = new Microsoft.VisualStudio.Coverage.Analysis.CoverageStatistics
             {
                 BlocksCovered = 1, BlocksNotCovered = 2, LinesCovered = 3, LinesNotCovered = 4, LinesPartiallyCovered = 5
@@ -64,10 +65,10 @@ namespace MSCover2Xml.Tests
 
             // Assert
             xml.Should().StartWith(
-                "<Root><ModuleName>Module</ModuleName><ImageSize>50</ImageSize><ImageLinkTime>1969-12-31T16:00:04.0000000</ImageLinkTime><BlocksCovered>72</BlocksCovered>" +
-                "<BlocksNotCovered>144</BlocksNotCovered><LinesCovered>216</LinesCovered><LinesNotCovered>288</LinesNotCovered><LinesPartiallyCovered>360</LinesPartiallyCovered><Namespaces>");
-            xml.Should().EndWith("</Namespaces></Root>");
-            xml.Should().HaveLength(24791);
+                "<Root><ModuleName>Module</ModuleName><ImageSize>50</ImageSize><ImageLinkTime>1969-12-31T16:00:04.0000000</ImageLinkTime><LinesCovered>216</LinesCovered>" +
+                "<LinesPartiallyCovered>360</LinesPartiallyCovered><LinesNotCovered>288</LinesNotCovered><BlocksCovered>72</BlocksCovered><BlocksNotCovered>144</BlocksNotCovered><NamespaceTable>");
+            xml.Should().EndWith("</NamespaceTable></Root>");
+            xml.Should().HaveLength(31140);
         }
     }
 }
