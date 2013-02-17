@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VSCoverageStatistics = Microsoft.VisualStudio.Coverage.Analysis.CoverageStatistics;
@@ -10,7 +11,7 @@ namespace MSCover2Xml.Tests
     {
         private static ClassStatistics CreateClassStatistics()
         {
-            var classStats = new ClassStatistics("Clazz");
+            var classStats = new ClassStatistics(new NamespaceStatistics(new ModuleStatistics("module", Guid.Empty, 0, 0), "ns"), "Clazz");
             foreach (var methodStats in Enumerable.Range(1, 10)
                 .Select(x => new MethodStatistics((uint)x, "Method " + x, "Method " + x, new VSCoverageStatistics
                 {
@@ -57,10 +58,10 @@ namespace MSCover2Xml.Tests
 
             // Assert
             xml.Should().StartWith(
-                "<Root><ClassName>Clazz</ClassName><BlocksCovered>55</BlocksCovered><BlocksNotCovered>45</BlocksNotCovered><LinesCovered>55</LinesCovered>" +
-                "<LinesNotCovered>45</LinesNotCovered><LinesPartiallyCovered>55</LinesPartiallyCovered><Methods>");
-            xml.Should().EndWith("</Methods></Root>");
-            xml.Should().HaveLength(3315);
+                "<Root><ClassKeyName>module00000000-0000-0000-0000-000000000000nsClazz</ClassKeyName><ClassName>Clazz</ClassName>" +
+                "<NamespaceKeyName>module00000000-0000-0000-0000-000000000000ns</NamespaceKeyName><LinesCovered>55</LinesCovered><LinesPartiallyCovered>55</LinesPartiallyCovered>");
+            xml.Should().EndWith("</Method></Root>");
+            xml.Should().HaveLength(4056);
          }
     }
 }

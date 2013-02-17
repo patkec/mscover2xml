@@ -18,6 +18,14 @@ namespace MSCover2Xml
         /// </summary>
         public string ClassName { get; private set; }
         /// <summary>
+        /// Gets the unique class name.
+        /// </summary>
+        public string UniqueName { get { return Namespace.UniqueName + ClassName; }}
+        /// <summary>
+        /// Gets the <see cref="NamespaceStatistics"/> containing the current class.
+        /// </summary>
+        public NamespaceStatistics Namespace { get; private set; }
+        /// <summary>
         /// Gets a list of coverage information for methods contained in the class.
         /// </summary>
         public IEnumerable<MethodStatistics> Methods { get { return _methods; } }
@@ -45,11 +53,14 @@ namespace MSCover2Xml
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassStatistics"/> class.
         /// </summary>
+        /// <param name="ns">Namespace containing the class.</param>
         /// <param name="name">Class name.</param>
-        internal ClassStatistics(string name)
+        internal ClassStatistics(NamespaceStatistics ns, string name)
         {
+            if (ns == null) throw new ArgumentNullException("ns");
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
+            Namespace = ns;
             ClassName = name;
         }
 
@@ -61,6 +72,7 @@ namespace MSCover2Xml
         {
             if (method == null) throw new ArgumentNullException("method");
 
+            method.Class = this;
             _methods.Add(method);
         }
 
@@ -71,18 +83,18 @@ namespace MSCover2Xml
         public void WriteXml(XmlWriter xmlWriter)
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
-
+            
+            xmlWriter.WriteElementString("ClassKeyName", UniqueName);
             xmlWriter.WriteElementString("ClassName", ClassName);
+            xmlWriter.WriteElementString("NamespaceKeyName", Namespace.UniqueName);
             WriteCoverageToXml(xmlWriter);
 
-            xmlWriter.WriteStartElement("Methods");
             foreach (var method in Methods)
             {
                 xmlWriter.WriteStartElement("Method");
                 method.WriteXml(xmlWriter);
                 xmlWriter.WriteEndElement();
             }
-            xmlWriter.WriteEndElement();
         }
 
         /// <summary>
