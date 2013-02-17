@@ -22,10 +22,7 @@ namespace MSCover2Xml.Console
             {
                 System.Console.WriteLine("Generating XML at {0} ...", options.OutputFile);
 
-                if (options.UseDataSetFormat)
-                    CoverageReport.WriteDataSetXml(options.InputFile, options.OutputFile, executablePaths, symbolPaths);
-                else
-                    CoverageReport.WriteXml(options.InputFile, options.OutputFile, executablePaths, symbolPaths);
+                CoverageReport.WriteXml(options.InputFile, options.OutputFile, executablePaths, symbolPaths);
 
                 System.Console.WriteLine("Done");
             }
