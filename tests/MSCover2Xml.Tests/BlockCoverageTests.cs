@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.Coverage.Analysis;
+﻿using Microsoft.VisualStudio.Coverage.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 
@@ -18,7 +17,7 @@ namespace MSCover2Xml.Tests
             string xml = TestHelper.GetXml(blockCoverage.WriteXml);
 
             // Assert
-            xml.Should().Be("<Root><LineStart>1</LineStart><LineEnd>1</LineEnd><ColumnStart>1</ColumnStart><ColumnEnd>255</ColumnEnd><Coverage>0</Coverage><FileID>1</FileID></Root>");
+            xml.Should().Be("<Root><LnStart>1</LnStart><ColStart>1</ColStart><LnEnd>1</LnEnd><ColEnd>255</ColEnd><Coverage>0</Coverage><SourceFileID>1</SourceFileID><LineID>0</LineID></Root>");
         }
     }
 }
