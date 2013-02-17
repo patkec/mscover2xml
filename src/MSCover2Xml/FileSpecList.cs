@@ -7,7 +7,7 @@ namespace MSCover2Xml
     /// <summary>
     /// Represents a list of <see cref="FileSpec"/> objects.
     /// </summary>
-    internal class FileSpecList: IEnumerable<FileSpec>
+    public class FileSpecList: IEnumerable<FileSpec>
     {
         private readonly List<FileSpec> _list = new List<FileSpec>();
 

@@ -75,12 +75,26 @@ namespace MSCover2Xml
         {
             if (coverageInfo == null) throw new ArgumentNullException("coverageInfo");
 
-            long lineStartId = 0;
             var files = new FileSpecList();
-            var modules = coverageInfo.Modules.Select(module => ModuleStatistics.Create(files, module, ref lineStartId)).ToList();
+            var modules = GetModules(coverageInfo, files).ToList();
 
             var report = new CoverageReport(modules, files);
             return report;
+        }
+
+        /// <summary>
+        /// Gets a list of module statistics from fiven coverage information.
+        /// </summary>
+        /// <param name="coverageInfo">Code coverage information for which to generate module list.</param>
+        /// <param name="files">List that will receive the files that were instrumented.</param>
+        /// <returns>An enumerable list of module statistics for coverage information.</returns>
+        public static IEnumerable<ModuleStatistics> GetModules(CoverageInfo coverageInfo, FileSpecList files = null)
+        {
+            if (coverageInfo == null) throw new ArgumentNullException("coverageInfo");
+
+            long lineStartId = 0;
+            files = files ?? new FileSpecList();
+            return coverageInfo.Modules.Select(x => ModuleStatistics.Create(files, x, ref lineStartId));
         }
 
         /// <summary>
