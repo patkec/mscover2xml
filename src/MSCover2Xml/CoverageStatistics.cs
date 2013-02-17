@@ -37,12 +37,12 @@ namespace MSCover2Xml
         protected void WriteCoverageToXml(XmlWriter xmlWriter)
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
-
+            
+            xmlWriter.WriteElementString("LinesCovered", LinesCovered.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("LinesPartiallyCovered", LinesPartiallyCovered.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("LinesNotCovered", LinesNotCovered.ToString(CultureInfo.InvariantCulture));
             xmlWriter.WriteElementString("BlocksCovered", BlocksCovered.ToString(CultureInfo.InvariantCulture));
             xmlWriter.WriteElementString("BlocksNotCovered", BlocksNotCovered.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("LinesCovered", LinesCovered.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("LinesNotCovered", LinesNotCovered.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("LinesPartiallyCovered", LinesPartiallyCovered.ToString(CultureInfo.InvariantCulture));
         }
     }
 }
