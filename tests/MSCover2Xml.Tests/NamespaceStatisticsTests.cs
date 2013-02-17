@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MSCover2Xml.Tests
@@ -11,7 +12,7 @@ namespace MSCover2Xml.Tests
 
         private static NamespaceStatistics CreateNamespaceStatistics()
         {
-            var namespaceStatistics = new NamespaceStatistics("Clazz");
+            var namespaceStatistics = new NamespaceStatistics(new ModuleStatistics("module", Guid.Empty, 0, 0),  "Clazz");
             var methodCoverageStats = new Microsoft.VisualStudio.Coverage.Analysis.CoverageStatistics
             {
                 BlocksCovered = 1, BlocksNotCovered = 2, LinesCovered = 3, LinesNotCovered = 4, LinesPartiallyCovered = 5
@@ -60,10 +61,11 @@ namespace MSCover2Xml.Tests
 
             // Assert
             xml.Should().StartWith(
-                "<Root><NamespaceName>Clazz</NamespaceName><BlocksCovered>36</BlocksCovered><BlocksNotCovered>72</BlocksNotCovered><LinesCovered>108</LinesCovered>" +
-                "<LinesNotCovered>144</LinesNotCovered><LinesPartiallyCovered>180</LinesPartiallyCovered><Classes>");
-            xml.Should().EndWith("</Classes></Root>");
-            xml.Should().HaveLength(12208);
+                "<Root><ModuleName>module</ModuleName><NamespaceName>Clazz</NamespaceName><NamespaceKeyName>module00000000-0000-0000-0000-000000000000Clazz</NamespaceKeyName>" +
+                "<LinesCovered>108</LinesCovered><LinesPartiallyCovered>180</LinesPartiallyCovered><LinesNotCovered>144</LinesNotCovered><BlocksCovered>36</BlocksCovered>" +
+                "<BlocksNotCovered>72</BlocksNotCovered><Class>");
+            xml.Should().EndWith("</Class></Root>");
+            xml.Should().HaveLength(15160);
         }
     }
 }

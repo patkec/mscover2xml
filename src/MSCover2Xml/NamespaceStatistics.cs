@@ -18,6 +18,14 @@ namespace MSCover2Xml
         /// </summary>
         public string NamespaceName { get; private set; }
         /// <summary>
+        /// Gets the unique namespace name.
+        /// </summary>
+        public string UniqueName { get { return string.Format("{0}{1}{2}", Module.Name, Module.Signature, NamespaceName); } }
+        /// <summary>
+        /// Gets the <see cref="ModuleStatistics"/> containing the current namespace.
+        /// </summary>
+        public ModuleStatistics Module { get; private set; }
+        /// <summary>
         /// Gets a list of statistics for classes included in the namespace.
         /// </summary>
         public IEnumerable<ClassStatistics> Classes { get { return _classes; } }
@@ -45,11 +53,14 @@ namespace MSCover2Xml
         /// <summary>
         /// Initializes a new instance of the <see cref="NamespaceStatistics"/> class.
         /// </summary>
+        /// <param name="module">Module containing the namespace.</param>
         /// <param name="name">Namespace name.</param>
-        internal NamespaceStatistics(string name)
+        internal NamespaceStatistics(ModuleStatistics module, string name)
         {
+            if (module == null) throw new ArgumentNullException("module");
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
 
+            Module = module;
             NamespaceName = name;
         }
 
@@ -63,7 +74,7 @@ namespace MSCover2Xml
             var classStats = _classes.Find(x => x.ClassName == className);
             if (classStats == null)
             {
-                classStats = new ClassStatistics(className);
+                classStats = new ClassStatistics(this, className);
                 _classes.Add(classStats);
             }
             return classStats;
@@ -76,18 +87,18 @@ namespace MSCover2Xml
         public void WriteXml(XmlWriter xmlWriter)
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
-
+            
+            xmlWriter.WriteElementString("ModuleName", Module.Name);
             xmlWriter.WriteElementString("NamespaceName", NamespaceName);
+            xmlWriter.WriteElementString("NamespaceKeyName", UniqueName);
             WriteCoverageToXml(xmlWriter);
 
-            xmlWriter.WriteStartElement("Classes");
             foreach (var cls in Classes)
             {
                 xmlWriter.WriteStartElement("Class");
                 cls.WriteXml(xmlWriter);
                 xmlWriter.WriteEndElement();
             }
-            xmlWriter.WriteEndElement();
         }
 
         /// <summary>
