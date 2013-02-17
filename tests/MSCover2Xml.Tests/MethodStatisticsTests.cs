@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VSCoverageStatistics = Microsoft.VisualStudio.Coverage.Analysis.CoverageStatistics;
 
@@ -39,14 +40,16 @@ namespace MSCover2Xml.Tests
             {
                 BlocksCovered = 1, BlocksNotCovered = 2, LinesCovered = 3, LinesNotCovered = 4, LinesPartiallyCovered = 5
             });
+            methodStats.Class = new ClassStatistics(new NamespaceStatistics(new ModuleStatistics("module", Guid.Empty, 0, 0), "ns"), "clazz");
 
             // Act
             var xml = TestHelper.GetXml(methodStats.WriteXml);
 
             // Assert
             xml.Should().Be(
-                "<Root><MethodID>1</MethodID><MethodName>Method</MethodName><MethodFullName>Method</MethodFullName><BlocksCovered>1</BlocksCovered>" +
-                "<BlocksNotCovered>2</BlocksNotCovered><LinesCovered>3</LinesCovered><LinesNotCovered>4</LinesNotCovered><LinesPartiallyCovered>5</LinesPartiallyCovered><Lines /></Root>");
+                "<Root><MethodKeyName>module00000000-0000-0000-0000-000000000000nsclazz!Method!1</MethodKeyName><MethodName>Method</MethodName><MethodFullName>Method</MethodFullName>" +
+                "<LinesCovered>3</LinesCovered><LinesPartiallyCovered>5</LinesPartiallyCovered><LinesNotCovered>4</LinesNotCovered><BlocksCovered>1</BlocksCovered>" +
+                "<BlocksNotCovered>2</BlocksNotCovered></Root>");
         }
     }
 }

@@ -25,6 +25,10 @@ namespace MSCover2Xml
         /// </summary>
         public long MethodId { get; private set; }
         /// <summary>
+        /// Gets the <see cref="ClassStatistics"/> containing the current method.
+        /// </summary>
+        public ClassStatistics Class { get; internal set; }
+        /// <summary>
         /// Gets the method name.
         /// </summary>
         public string MethodName { get; private set; }
@@ -32,6 +36,10 @@ namespace MSCover2Xml
         /// Gets the method full name.
         /// </summary>
         public string MethodFullName { get; private set; }
+        /// <summary>
+        /// Gets the unique method name.
+        /// </summary>
+        public string UniqueName { get { return string.Format("{0}!{1}!{2}", Class.UniqueName, MethodFullName, MethodId); }}
         /// <summary>
         /// Gets a list of coverage information for separate blocks in the method.
         /// </summary>
@@ -89,14 +97,16 @@ namespace MSCover2Xml
         /// <param name="coverageBuffer">Coverage buffer.</param>
         /// <param name="lines">Lines representing the method.</param>
         /// <param name="files">List to which instrumented files are added.</param>
+        /// <param name="lineStartId">Starting identification number for lines.</param>
         /// <returns>New <see cref="MethodStatistics"/> instance.</returns>
-        internal static MethodStatistics Create(uint id, string name, string fullName, byte[] coverageBuffer, IList<BlockLineRange> lines, FileSpecList files)
+        internal static MethodStatistics Create(uint id, string name, string fullName, byte[] coverageBuffer, IList<BlockLineRange> lines, FileSpecList files, ref long lineStartId)
         {
             var coverageStats = CoverageInfo.GetMethodStatistics(coverageBuffer, lines);
             var methodStats = new MethodStatistics(id, name, fullName, coverageStats);
 
             foreach (var block in BlockCoverage.CreateForMethod(coverageBuffer, lines, files))
-                methodStats.AddBlock(block);
+                if (methodStats.AddBlock(block))
+                    block.Id = lineStartId++;
 
             return methodStats;
         }
@@ -105,12 +115,16 @@ namespace MSCover2Xml
         /// Adds block coverage information for the method.
         /// </summary>
         /// <param name="block"><see cref="BlockCoverage"/> representing one or more block coverage information for the method.</param>
-        internal void AddBlock(BlockCoverage block)
+        internal bool AddBlock(BlockCoverage block)
         {
             if (block == null) throw new ArgumentNullException("block");
 
             if (!_blocks.Contains(block))
+            {
                 _blocks.Add(block);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -120,20 +134,18 @@ namespace MSCover2Xml
         public void WriteXml(XmlWriter xmlWriter)
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
-
-            xmlWriter.WriteElementString("MethodID", MethodId.ToString());
+            
+            xmlWriter.WriteElementString("MethodKeyName", UniqueName);
             xmlWriter.WriteElementString("MethodName", MethodName);
             xmlWriter.WriteElementString("MethodFullName", MethodFullName);
             WriteCoverageToXml(xmlWriter);
 
-            xmlWriter.WriteStartElement("Lines");
             foreach (var line in Blocks)
             {
-                xmlWriter.WriteStartElement("Line");
+                xmlWriter.WriteStartElement("Lines");
                 line.WriteXml(xmlWriter);
                 xmlWriter.WriteEndElement();
             }
-            xmlWriter.WriteEndElement();
         }
 
         /// <summary>
