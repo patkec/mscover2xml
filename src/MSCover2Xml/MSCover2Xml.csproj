@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ClassStatistics.cs" />
     <Compile Include="CoverageReport.cs" />
+    <Compile Include="CoverageReportOptions.cs" />
     <Compile Include="FileSpec.cs" />
     <Compile Include="CoverageStatistics.cs" />
     <Compile Include="BlockCoverage.cs" />

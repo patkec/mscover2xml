@@ -58,7 +58,7 @@ namespace MSCover2Xml
         /// <param name="executablePaths">List of executable paths.</param>
         /// <param name="symbolPaths">List of symbol paths.</param>
         /// <returns>A new instance of <see cref="CoverageReport"/> class.</returns>
-        public static CoverageReport Create(string coverageFile, IEnumerable<string> executablePaths, IEnumerable<string> symbolPaths)
+        public static CoverageReport Create(string coverageFile, IEnumerable<string> executablePaths = null, IEnumerable<string> symbolPaths = null)
         {
             if (string.IsNullOrEmpty(coverageFile)) throw new ArgumentNullException("coverageFile");
 
@@ -75,8 +75,9 @@ namespace MSCover2Xml
         {
             if (coverageInfo == null) throw new ArgumentNullException("coverageInfo");
 
+            long lineStartId = 0;
             var files = new FileSpecList();
-            var modules = coverageInfo.Modules.Select(module => ModuleStatistics.Create(files, module)).ToList();
+            var modules = coverageInfo.Modules.Select(module => ModuleStatistics.Create(files, module, ref lineStartId)).ToList();
 
             var report = new CoverageReport(modules, files);
             return report;
@@ -101,14 +102,12 @@ namespace MSCover2Xml
 
         private static void WriteListToXml<T>(XmlWriter xmlWriter, string elementName, IEnumerable<T> items, Action<XmlWriter, T> writeAction)
         {
-            xmlWriter.WriteStartElement(elementName + "s");
             foreach (var item in items)
             {
                 xmlWriter.WriteStartElement(elementName);
                 writeAction(xmlWriter, item);
                 xmlWriter.WriteEndElement();
             }
-            xmlWriter.WriteEndElement();
         }
 
         /// <summary>
@@ -119,24 +118,33 @@ namespace MSCover2Xml
         /// <param name="outputFile">Output file to which the XML will be saved.</param>
         /// <param name="executablePaths">List of executable paths.</param>
         /// <param name="symbolPaths">List of symbol paths.</param>
-        public static void WriteXml(string coverageFile, string outputFile, IEnumerable<string> executablePaths, IEnumerable<string> symbolPaths)
+        /// <param name="options">Options for the coverage report.</param>
+        public static void WriteXml(string coverageFile, string outputFile, 
+            IEnumerable<string> executablePaths = null, IEnumerable<string> symbolPaths = null, CoverageReportOptions options = null)
         {
             if (string.IsNullOrEmpty(coverageFile)) throw new ArgumentNullException("coverageFile");
             if (String.IsNullOrEmpty(outputFile)) throw new ArgumentNullException("outputFile");
 
+            options = options ?? new CoverageReportOptions();
+
             using (var coverageInfo = CreateCoverageInfo(coverageFile, executablePaths, symbolPaths))
             using (var outputStream = File.CreateText(outputFile))
-            using (var xmlWriter = XmlWriter.Create(outputStream, new XmlWriterSettings { OmitXmlDeclaration = false }))
+            using (var xmlWriter = XmlWriter.Create(outputStream, new XmlWriterSettings { OmitXmlDeclaration = false, Indent = true}))
             {
                 var files = new FileSpecList();
-                
+
+                var rootName = string.IsNullOrEmpty(options.RootName) ? "CoverageDSPriv" : options.RootName;
+                xmlWriter.WriteStartElement(rootName);
+
+                long lineStartId = 0;
                 WriteListToXml(xmlWriter, "Module", coverageInfo.Modules, (writer, item) =>
                 {
-                    var moduleStats = ModuleStatistics.Create(files, item);
+                    var moduleStats = ModuleStatistics.Create(files, item, ref lineStartId);
                     moduleStats.WriteXml(writer);
                 });
+                WriteListToXml(xmlWriter, "SourceFileNames", files, (writer, item) => item.WriteXml(writer));
 
-                WriteListToXml(xmlWriter, "File", files, (writer, item) => item.WriteXml(writer));
+                xmlWriter.WriteEndElement();
             }
         }
 
@@ -150,22 +158,6 @@ namespace MSCover2Xml
 
             WriteListToXml(xmlWriter, "Module", Modules, (writer, item) => item.WriteXml(writer));
             WriteListToXml(xmlWriter, "File", Files, (writer, item) => item.WriteXml(writer));
-        }
-
-        /// <summary>
-        /// Writes coverage information from specified coverage file as a <see cref="CoverageDS"/> to the specified output file.
-        /// </summary>
-        /// <param name="coverageFile">Path to the code coverage binary file.</param>
-        /// <param name="outputFile">Output file to which the XML will be saved.</param>
-        /// <param name="executablePaths">List of executable paths.</param>
-        /// <param name="symbolPaths">List of symbol paths.</param>
-        public static void WriteDataSetXml(string coverageFile, string outputFile, IEnumerable<string> executablePaths, IEnumerable<string> symbolPaths)
-        {
-            if (string.IsNullOrEmpty(coverageFile)) throw new ArgumentNullException("coverageFile");
-            if (String.IsNullOrEmpty(outputFile)) throw new ArgumentNullException("outputFile");
-
-            var dataSet = CreateCoverageInfo(coverageFile, executablePaths, symbolPaths).BuildDataSet();
-            dataSet.WriteXml(outputFile);
         }
     }
 }
