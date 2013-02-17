@@ -10,6 +10,7 @@ namespace MSCover2Xml
     [Serializable]
     public sealed class BlockCoverage
     {
+        public long Id { get; internal set; }
         /// <summary>
         /// Gets or sets the starting line of code coverage block.
         /// </summary>
@@ -38,6 +39,7 @@ namespace MSCover2Xml
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockCoverage"/> class.
         /// </summary>
+        /// <param name="id">Block identification.</param>
         /// <param name="file"><see cref="FileSpec"/> containing the instrumented line.</param>
         /// <param name="lineStart">Starting line of code coverage block.</param>
         /// <param name="lineEnd">Ending line of code coverage block.</param>
@@ -60,6 +62,7 @@ namespace MSCover2Xml
         /// <param name="coverageBuffer">Buffer containing all coverage information.</param>
         /// <param name="lines">Lines representing a single method.</param>
         /// <param name="files">List to which instrumented files are added.</param>
+        /// <param name="startId">Starting identification number for blocks.</param>
         internal static IEnumerable<BlockCoverage> CreateForMethod(byte[] coverageBuffer, IList<BlockLineRange> lines, FileSpecList files)
         {
             if (coverageBuffer == null) throw new ArgumentNullException("coverageBuffer");
@@ -102,13 +105,14 @@ namespace MSCover2Xml
         public void WriteXml(XmlWriter xmlWriter)
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
-
-            xmlWriter.WriteElementString("LineStart", LineStart.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("LineEnd", LineEnd.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("ColumnStart", ColumnStart.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("ColumnEnd", ColumnEnd.ToString(CultureInfo.InvariantCulture));
+            
+            xmlWriter.WriteElementString("LnStart", LineStart.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("ColStart", ColumnStart.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("LnEnd", LineEnd.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("ColEnd", ColumnEnd.ToString(CultureInfo.InvariantCulture));
             xmlWriter.WriteElementString("Coverage", ((int)Coverage).ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("FileID", File.Id.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("SourceFileID", File.Id.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("LineID", Id.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
