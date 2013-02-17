@@ -11,6 +11,10 @@ namespace MSCover2Xml.MSBuild.Tasks
     public class ConvertMSTestCoverageToXml: Task
     {
         /// <summary>
+        /// Gets or sets a value that indicates if CoverageDS format should be used.
+        /// </summary>
+        public bool UseDataSetFormat { get; set; }
+        /// <summary>
         /// Gets or sets a list of MS test coverage files which should be converted to XML.
         /// </summary>
         [Required]
@@ -48,7 +52,10 @@ namespace MSCover2Xml.MSBuild.Tasks
                         string outputFile = GetOutputFile(itemSpec);
                         string symbolsDirectory = GetSymbolsDirectory(itemSpec);
 
-                        CoverageReport.WriteXml(itemSpec, outputFile, new[] { symbolsDirectory }, new[] { symbolsDirectory });
+                        if (UseDataSetFormat)
+                            CoverageReport.WriteDataSetXml(itemSpec, outputFile, new[] { symbolsDirectory }, new[] { symbolsDirectory });
+                        else
+                            CoverageReport.WriteXml(itemSpec, outputFile, new[] { symbolsDirectory }, new[] { symbolsDirectory });
                         
                         list.Add(new TaskItem(outputFile));
                         Log.LogMessageFromResources(MessageImportance.Normal, "WrittenXmlCoverageFile", new object[] { outputFile });

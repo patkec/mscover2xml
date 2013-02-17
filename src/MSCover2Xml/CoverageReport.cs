@@ -112,7 +112,7 @@ namespace MSCover2Xml
         }
 
         /// <summary>
-        /// Writes coverage information from specified coverate file as XML to the specified output file.
+        /// Writes coverage information from specified coverage file as XML to the specified output file.
         /// </summary>
         /// <remarks>Using this method is recommended if coverage information contains lots of data.</remarks>
         /// <param name="coverageFile">Path to the code coverage binary file.</param>
@@ -150,6 +150,22 @@ namespace MSCover2Xml
 
             WriteListToXml(xmlWriter, "Module", Modules, (writer, item) => item.WriteXml(writer));
             WriteListToXml(xmlWriter, "File", Files, (writer, item) => item.WriteXml(writer));
+        }
+
+        /// <summary>
+        /// Writes coverage information from specified coverage file as a <see cref="CoverageDS"/> to the specified output file.
+        /// </summary>
+        /// <param name="coverageFile">Path to the code coverage binary file.</param>
+        /// <param name="outputFile">Output file to which the XML will be saved.</param>
+        /// <param name="executablePaths">List of executable paths.</param>
+        /// <param name="symbolPaths">List of symbol paths.</param>
+        public static void WriteDataSetXml(string coverageFile, string outputFile, IEnumerable<string> executablePaths, IEnumerable<string> symbolPaths)
+        {
+            if (string.IsNullOrEmpty(coverageFile)) throw new ArgumentNullException("coverageFile");
+            if (String.IsNullOrEmpty(outputFile)) throw new ArgumentNullException("outputFile");
+
+            var dataSet = CreateCoverageInfo(coverageFile, executablePaths, symbolPaths).BuildDataSet();
+            dataSet.WriteXml(outputFile);
         }
     }
 }

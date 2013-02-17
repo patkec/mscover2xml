@@ -13,6 +13,8 @@ namespace MSCover2Xml.Console
         public string ExecutablePaths { get; set; }
         [Option("s", "symbols", HelpText = "Semicolon-delimited list of symbol paths.", Required = false)]
         public string SymbolPaths { get; set; }
+        [Option("ds", "dataset", HelpText = "Use built-in ConvertDS dataset format instead of custom format.", Required = false, DefaultValue = false)]
+        public bool UseDataSetFormat { get; set; }
 
         [HelpOption]
         public string GetUsage()
