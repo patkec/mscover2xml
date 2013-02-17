@@ -40,8 +40,8 @@ namespace MSCover2Xml
         {
             if (xmlWriter == null) throw new ArgumentNullException("xmlWriter");
 
-            xmlWriter.WriteElementString("FileID", Id.ToString(CultureInfo.InvariantCulture));
-            xmlWriter.WriteElementString("FileName", FileName);
+            xmlWriter.WriteElementString("SourceFileID", Id.ToString(CultureInfo.InvariantCulture));
+            xmlWriter.WriteElementString("SourceFileName", FileName);
         }
 
         /// <summary>

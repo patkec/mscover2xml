@@ -16,7 +16,7 @@ namespace MSCover2Xml.Tests
             var xml = TestHelper.GetXml(fileSpec.WriteXml);
 
             // Assert
-            xml.Should().Be("<Root><FileID>1</FileID><FileName>file.ext</FileName></Root>");
+            xml.Should().Be("<Root><SourceFileID>1</SourceFileID><SourceFileName>file.ext</SourceFileName></Root>");
         }
     }
 }
